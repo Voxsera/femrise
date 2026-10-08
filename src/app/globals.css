@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =====================================================================
+   FEMRISE! — modern fitness brand + editorial magazine + hand-drawn journal
+   ===================================================================== */
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html,
+  body {
+    /* decorative blobs and the tilted ticker bleed past the edges — never cause sideways scrolling */
+    overflow-x: clip;
+  }
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-fr-warm font-sans text-ink antialiased;
+  }
+  ::selection {
+    @apply bg-fr-yellow text-ink;
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-[1240px] px-5 sm:px-8 lg:px-10;
+  }
+
+  /* Oversized display headlines with tight line-height */
+  .h-display {
+    @apply font-display font-bold leading-[0.98] tracking-[-0.03em];
+  }
+  .hand {
+    @apply font-hand;
+  }
+
+  /* Small label with a yellow marker swipe behind it */
+  .eyebrow {
+    @apply relative inline-block text-[12px] font-bold uppercase tracking-[0.16em] text-ink;
+    background-image: linear-gradient(transparent 55%, #fbbe18 55%, #fbbe18 90%, transparent 90%);
+    padding: 0 0.25em;
+  }
+
+  /* Highlighter behind a word */
+  .marker {
+    background-image: linear-gradient(transparent 58%, #fbbe18 58%, #fbbe18 92%, transparent 92%);
+    padding: 0 0.06em;
+  }
+
+  /* Cream card · black border · offset shadow · playful hover */
+  .card-pop {
+    @apply rounded-[14px] border-2 border-ink bg-fr-cream shadow-pop;
+  }
+  .card-pop-hover {
+    @apply transition-transform duration-200 ease-out hover:-translate-x-0.5 hover:-translate-y-1 hover:-rotate-[0.6deg] hover:shadow-pop-lg;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-bold transition-transform duration-150 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-fr-blue/40 active:translate-y-0.5;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-white hover:-translate-y-0.5 hover:-rotate-1;
+  }
+  .btn-yellow {
+    @apply btn border-2 border-ink bg-fr-yellow text-ink shadow-pop-sm hover:-translate-y-0.5 hover:rotate-1;
+  }
+  .btn-outline {
+    @apply btn border-2 border-ink bg-transparent text-ink hover:bg-ink hover:text-white;
+  }
+
+  .field {
+    @apply w-full rounded-[10px] border-2 border-ink bg-white px-4 py-3 text-[15px] text-ink outline-none transition placeholder:text-fr-muted focus:shadow-pop-sm;
+  }
+  .label-field {
+    @apply mb-1.5 block text-[13px] font-bold text-ink;
+  }
+
+  /* Masking tape strip for "polaroid" cards */
+  .tape {
+    @apply pointer-events-none absolute left-1/2 top-0 z-10 h-6 w-24 -translate-x-1/2 -translate-y-1/2 -rotate-3;
+    background: rgba(251, 190, 24, 0.75);
+    clip-path: polygon(3% 0, 97% 4%, 100% 50%, 96% 100%, 2% 96%, 0 50%);
+  }
+
+  /* Faint notebook rules */
+  .notebook {
+    background-image: repeating-linear-gradient(transparent 0 39px, rgba(11, 11, 11, 0.07) 39px 40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
