@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { CalendarCheck, Camera, RotateCcw } from "lucide-react";
+import { CalendarCheck, Camera, Trophy } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { MarkerUnderline, Arrow } from "@/components/doodle/Doodles";
 import { HeroVisual } from "./HeroVisual";
@@ -20,12 +20,10 @@ function findHeroPhoto() {
 
 export function Hero({
   fee,
-  restoreFee,
   participantCount,
   avatars,
 }: {
   fee: number;
-  restoreFee: number;
   participantCount: number;
   avatars: LeaderboardRow[];
 }) {
@@ -33,7 +31,7 @@ export function Hero({
   const perks = [
     { Icon: CalendarCheck, label: "30 days", sub: "Any sport counts", tint: "#DCE8FF", color: "#1748E8" },
     { Icon: Camera, label: "Daily check-in", sub: "One snap a day", tint: "#E5F4DF", color: "#62B946" },
-    { Icon: RotateCcw, label: "1 Restore", sub: `Missed a day? ₹${restoreFee}`, tint: "#FFF6D8", color: "#F4A623" },
+    { Icon: Trophy, label: "Final round", sub: "On-ground · ₹30K", tint: "#FFF6D8", color: "#F4A623" },
   ];
 
   return (
@@ -43,8 +41,8 @@ export function Hero({
           <HeroCopy />
 
           <p className="mt-6 max-w-md text-[17px] leading-relaxed text-fr-charcoal">
-            Show up for yourself for 30 days. <b>Play your sport</b>, post your <b>daily check-in</b>, protect your streak
-            and climb the leaderboard.
+            Show up for yourself for 30 days. <b>Play your sport</b>, post your <b>daily check-in</b>, climb the
+            leaderboard and make it to the <b>final on-ground round</b>.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-x-12 gap-y-4">

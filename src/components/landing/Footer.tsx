@@ -20,7 +20,7 @@ export function Footer({ fee, cta = true }: { fee?: number; cta?: boolean }) {
             <h2 className="h-display mx-auto mt-6 max-w-4xl text-5xl sm:text-7xl lg:text-8xl">
               30 days. One streak.
               <br />
-              <span className="font-hand font-normal">A chance to win an iPhone!</span>
+              <span className="font-hand font-normal">Win ₹30,000 prize money!</span>
             </h2>
             <div className="mt-10 flex justify-center">
               <ButtonLink href="/join">Join the challenge — ₹{fee ?? 99}</ButtonLink>

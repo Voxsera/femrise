@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Blob, Sticker, Arrow, Sparks } from "@/components/doodle/Doodles";
 import { Avatar } from "@/components/ui/Avatar";
 import { StreakCalendar } from "@/components/ui/StreakCalendar";
-import { PhoneSketch } from "./PhoneSketch";
+import { PrizeCard } from "./PrizeCard";
 import { demoDays } from "@/lib/streak";
 import type { LeaderboardRow } from "@/lib/types";
 
@@ -53,10 +53,10 @@ export function HeroVisual({ photo, participantCount, avatars }: { photo: string
             <StreakCalendar days={demoDays(11)} compact className="mt-4" />
           </motion.div>
 
-          {/* prize phone */}
-          <motion.div {...pop(0.45, 8)} className="absolute right-[6%] top-[38%] w-[30%]">
+          {/* prize card */}
+          <motion.div {...pop(0.45, 8)} className="absolute right-[4%] top-[44%] w-[34%] text-[11px] sm:text-[15px]">
             <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}>
-              <PhoneSketch />
+              <PrizeCard short />
             </motion.div>
           </motion.div>
 
@@ -79,9 +79,9 @@ export function HeroVisual({ photo, participantCount, avatars }: { photo: string
       </div>
       <div className="absolute right-[2%] top-[24%]">
         <Sticker color="#FFF6D8" rotate={6}>
-          Win an
+          Win
           <br />
-          iPhone
+          ₹30,000
         </Sticker>
       </div>
       <div className="absolute bottom-[30%] left-[-4%]">

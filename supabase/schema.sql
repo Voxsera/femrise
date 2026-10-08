@@ -67,7 +67,7 @@ create table public.challenges (
   checkin_deadline time,
   unrestored_miss_policy public.unrestored_miss_policy not null default 'eliminate',
   last_processed_day int not null default 0,
-  prize_headline text not null default 'A chance to win an iPhone',
+  prize_headline text not null default 'Win ₹30,000 prize money',
   prize_text text,
   prize_terms text,
   rules jsonb not null default '[]'::jsonb,
@@ -912,8 +912,8 @@ create policy "update own avatar" on storage.objects for update to authenticated
 insert into public.challenges (slug, name, status, duration_days, prize_text, rules)
 values (
   '30-day-sports-challenge', '30 Day Sports Challenge', 'registration_open', 30,
-  'Complete the challenge. Stay consistent. Climb the leaderboard. You could get a chance to win an iPhone.',
-  '["Entry fee: ₹99","Challenge duration: 30 days","One daily sports check-in required","Participants must upload a daily snap","Missing a day breaks the streak","Each participant gets ONE Restore opportunity","Restore costs ₹50","Missing another day after using Restore means elimination","Earn additional points through successful referrals","The leaderboard is visible to all participants","Choose a Public or Private profile","Private profiles still appear on the leaderboard","Private snaps are only visible to approved followers","Uploaded content must follow community guidelines"]'::jsonb
+  'Complete the 30-day challenge, stay consistent and climb the leaderboard. Then step up for the final on-ground round and compete to win ₹30,000 in prize money.',
+  '["Entry fee: ₹99","Challenge duration: 30 days","One daily sports check-in required","Participants must upload a daily snap","Missing a day breaks the streak","Earn additional points through successful referrals","The leaderboard is visible to all participants","The challenge ends with a final on-ground round","The winner of the on-ground round wins ₹30,000 prize money","Choose a Public or Private profile","Private profiles still appear on the leaderboard","Private snaps are only visible to approved followers","Uploaded content must follow community guidelines"]'::jsonb
 ) on conflict (slug) do nothing;
 
 -- =====================================================================

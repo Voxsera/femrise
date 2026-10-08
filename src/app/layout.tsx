@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Femrise! — 30 Day Sports Challenge",
   description:
-    "30 days. One streak. A chance to win an iPhone. Play your sport, post your daily check-in, protect your streak and climb the leaderboard.",
+    "30 days. One streak. One final on-ground round. Play your sport, post your daily check-in, climb the leaderboard and compete to win ₹30,000 prize money.",
   icons: { icon: "/brand/femrise-logo.png" },
   openGraph: {
     title: "Femrise! — 30 Day Sports Challenge",

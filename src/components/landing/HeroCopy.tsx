@@ -5,7 +5,7 @@ import { MarkerUnderline, Burst } from "@/components/doodle/Doodles";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-/** "30 Days. One Streak! A chance to win an iPhone." — staggered entrance. */
+/** "30 Days. One Streak! Win ₹30,000 prize money." — staggered entrance. */
 export function HeroCopy() {
   return (
     <div className="relative">
@@ -38,7 +38,7 @@ export function HeroCopy() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        A chance to win an <span className="relative inline-block">iPhone.<MarkerUnderline className="absolute -bottom-3 left-0 h-4 w-full" /></span>
+        Win <span className="relative inline-block">₹30,000<MarkerUnderline className="absolute -bottom-3 left-0 h-4 w-full" /></span> prize money.
       </motion.p>
     </div>
   );

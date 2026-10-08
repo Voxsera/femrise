@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { ButtonLink } from "@/components/ui/Button";
 import { SectionHead } from "@/components/ui/SectionHead";
 import { Blob, Sticker, Sparks, Burst } from "@/components/doodle/Doodles";
-import { PhoneSketch } from "./PhoneSketch";
+import { PrizeCard } from "./PrizeCard";
 
 export function PrizeSection({ prizeText, prizeTerms }: { prizeText: string; prizeTerms: string | null }) {
   const ref = useRef<HTMLElement>(null);
@@ -19,9 +19,9 @@ export function PrizeSection({ prizeText, prizeTerms }: { prizeText: string; pri
         <div className="relative mx-auto aspect-square w-full max-w-[480px]">
           <Blob seed={41} color="#FBBE18" className="absolute inset-0 w-full" />
           <Blob seed={5} color="#1748E8" wobble={0.4} className="absolute -bottom-4 -left-4 w-[32%]" />
-          <div className="absolute left-1/2 top-[12%] w-[38%] -translate-x-1/2 text-[18px]">
+          <div className="absolute left-1/2 top-[22%] w-[62%] -translate-x-1/2 text-[13px] sm:text-[18px]">
             <motion.div style={{ y, rotate }}>
-              <PhoneSketch />
+              <PrizeCard />
             </motion.div>
           </div>
           <Sparks className="absolute left-[24%] top-[6%] h-10 w-14 -rotate-12" />
@@ -40,11 +40,23 @@ export function PrizeSection({ prizeText, prizeTerms }: { prizeText: string; pri
             eyebrow="The prize"
             title={
               <>
-                Your streak could take you <span className="marker">here.</span>
+                Your streak leads to the <span className="marker">final.</span>
               </>
             }
             intro={prizeText}
           />
+          <ol className="mt-8 grid gap-3 sm:grid-cols-2">
+            {[
+              ["01", "Complete the 30-day challenge"],
+              ["02", "Stay consistent, every day"],
+              ["03", "Climb the leaderboard"],
+              ["04", "Win the on-ground final — ₹30,000"],
+            ].map(([n, t]) => (
+              <li key={n} className="flex items-center gap-3 rounded-[12px] border-2 border-ink bg-white px-4 py-3 text-[15px] font-bold shadow-pop-sm">
+                <span className="font-display text-fr-blue">{n}</span> {t}
+              </li>
+            ))}
+          </ol>
           <div className="mt-9 flex flex-wrap items-center gap-x-12 gap-y-4">
             <ButtonLink href="/join" variant="yellow">
               Start my streak

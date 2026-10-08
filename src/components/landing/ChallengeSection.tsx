@@ -6,10 +6,10 @@ import { StreakCalendar, CALENDAR_LEGEND } from "@/components/ui/StreakCalendar"
 import { Arrow, Circled, Blob } from "@/components/doodle/Doodles";
 import type { DayState } from "@/lib/types";
 
-// Example journey: day 9 missed then restored, today is Day 13.
-const example: DayState[] = Array.from({ length: 30 }, (_, i) => (i === 8 ? "restored" : i < 12 ? "completed" : i === 12 ? "current" : "future"));
+// Example journey: 12 days done, today is Day 13.
+const example: DayState[] = Array.from({ length: 30 }, (_, i) => (i < 12 ? "completed" : i === 12 ? "current" : "future"));
 
-export function ChallengeSection({ duration, restoreFee }: { duration: number; restoreFee: number }) {
+export function ChallengeSection({ duration }: { duration: number }) {
   return (
     <section id="challenge" className="relative overflow-hidden border-y-2 border-ink bg-fr-cream py-24 lg:py-32">
       <Blob seed={31} color="#DCE8FF" className="absolute -left-24 top-10 w-72 opacity-80" />
@@ -33,8 +33,8 @@ export function ChallengeSection({ duration, restoreFee }: { duration: number; r
             </Circled>
           </p>
           <p className="mt-6 max-w-md text-[16px] leading-relaxed text-fr-charcoal">
-            Every day, complete one sports activity and upload a daily check-in. Miss a day and you can Restore your
-            streak once for ₹{restoreFee}.
+            Every day, complete one sports activity and upload a daily check-in. Stay consistent, climb the leaderboard
+            and earn your shot at the final on-ground round.
           </p>
         </div>
 
@@ -55,7 +55,7 @@ export function ChallengeSection({ duration, restoreFee }: { duration: number; r
           </div>
           <StreakCalendar days={example.slice(0, duration)} />
           <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-[13px] font-medium text-fr-charcoal">
-            {CALENDAR_LEGEND.map(([c, l]) => (
+            {CALENDAR_LEGEND.filter(([, l]) => l !== "Restored").map(([c, l]) => (
               <li key={l} className="flex items-center gap-1.5">
                 <span className={`h-3.5 w-3.5 rounded-[4px] border-2 border-ink ${c}`} /> {l}
               </li>
@@ -63,7 +63,7 @@ export function ChallengeSection({ duration, restoreFee }: { duration: number; r
           </ul>
           <div className="absolute -bottom-14 right-6 hidden items-end gap-1 sm:flex">
             <Arrow variant="up" className="h-12 w-16 -scale-x-100" />
-            <span className="font-hand text-2xl">day 9 restored!</span>
+            <span className="font-hand text-2xl">12 days strong!</span>
           </div>
         </motion.div>
       </div>

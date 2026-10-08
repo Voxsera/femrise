@@ -27,10 +27,10 @@ export default async function HomePage() {
       {isDemo && <DemoBanner />}
       <Navbar fee={fee} />
       <main>
-        <Hero fee={fee} restoreFee={settings.restoreFee} participantCount={participantCount} avatars={leaderboard} />
+        <Hero fee={fee} participantCount={participantCount} avatars={leaderboard} />
         <SportsMarquee />
-        <HowItWorks fee={fee} restoreFee={settings.restoreFee} />
-        <ChallengeSection duration={settings.durationDays} restoreFee={settings.restoreFee} />
+        <HowItWorks fee={fee} />
+        <ChallengeSection duration={settings.durationDays} />
         <PrizeSection prizeText={settings.prizeText} prizeTerms={settings.prizeTerms} />
         <RulesSection rules={settings.rules} guidelines={settings.communityGuidelines} />
         <ReferralSection referralPoints={settings.referralPoints} siteUrl={env.siteUrl} />

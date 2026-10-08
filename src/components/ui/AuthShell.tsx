@@ -26,7 +26,7 @@ export function AuthShell({ children, title, kicker }: { children: React.ReactNo
             ₹99 entry
           </Sticker>
           <Sticker color="#E5F4DF" rotate={5}>
-            1 Restore
+            ₹30K prize
           </Sticker>
           <Arrow variant="up" className="h-12 w-16" />
         </div>
