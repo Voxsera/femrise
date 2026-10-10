@@ -5,14 +5,14 @@ import type { CommunityCard, LeaderboardRow } from "./types";
 
 const people: Array<[string, string, string, string, number, number, number, boolean]> = [
   // username, name, sport, city, streak, points, referrals, private
-  ["smash.sana", "Sana R.", "Badminton", "Hyderabad", 30, 420, 12, false],
-  ["laps.with.lara", "Lara M.", "Swimming", "Bengaluru", 29, 398, 10, true],
-  ["kick.it.kavya", "Kavya P.", "Football", "Mumbai", 28, 381, 9, false],
-  ["run.riya", "Riya S.", "Running", "Pune", 27, 352, 6, false],
-  ["hoops.hiba", "Hiba K.", "Basketball", "Hyderabad", 27, 340, 5, true],
-  ["ace.anaya", "Anaya D.", "Tennis", "Chennai", 26, 331, 6, false],
-  ["pedal.priya", "Priya N.", "Cycling", "Delhi", 25, 312, 4, false],
-  ["roll.with.rhea", "Rhea J.", "Skating", "Goa", 24, 296, 3, true],
+  ["smash.sana", "Sana R.", "Badminton", "Hyderabad", 21, 290, 12, false],
+  ["laps.with.lara", "Lara M.", "Swimming", "Bengaluru", 20, 275, 10, true],
+  ["kick.it.kavya", "Kavya P.", "Football", "Mumbai", 19, 262, 9, false],
+  ["run.riya", "Riya S.", "Running", "Pune", 18, 240, 6, false],
+  ["hoops.hiba", "Hiba K.", "Basketball", "Hyderabad", 18, 233, 5, true],
+  ["ace.anaya", "Anaya D.", "Tennis", "Chennai", 17, 226, 6, false],
+  ["pedal.priya", "Priya N.", "Cycling", "Delhi", 16, 212, 4, false],
+  ["roll.with.rhea", "Rhea J.", "Skating", "Goa", 15, 201, 3, true],
 ];
 
 export const DEMO_LEADERBOARD: LeaderboardRow[] = people.map(

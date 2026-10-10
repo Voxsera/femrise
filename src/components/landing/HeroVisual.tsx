@@ -47,7 +47,7 @@ export function HeroVisual({ photo, participantCount, avatars }: { photo: string
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] sm:text-[11px]">Your streak</p>
             <p className="h-display mt-1 text-[2rem] sm:text-5xl">12 days</p>
             <div className="mt-2 flex items-center justify-between text-[11px] font-bold sm:text-[13px]">
-              <span>Day 12 / 30</span>
+              <span>Day 12 / 21</span>
               <span className="rounded-full border-2 border-ink bg-fr-green px-2 py-0.5 text-[11px]">Active</span>
             </div>
             <StreakCalendar days={demoDays(11)} compact className="mt-4" />

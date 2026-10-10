@@ -15,7 +15,7 @@ export function AuthShell({ children, title, kicker }: { children: React.ReactNo
         </div>
         <div className="relative">
           <p className="h-display text-7xl">
-            30 Days.
+            21 Days.
             <br />
             One <span className="font-hand font-normal text-white" style={{ WebkitTextStroke: "2px #0B0B0B" }}>Streak!</span>
           </p>

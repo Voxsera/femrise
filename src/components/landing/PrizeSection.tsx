@@ -28,7 +28,7 @@ export function PrizeSection({ prizeText, prizeTerms }: { prizeText: string; pri
           <Burst className="absolute right-[18%] top-[16%] h-10 w-10 -rotate-12" color="#0B0B0B" />
           <div className="absolute bottom-[10%] right-[2%]">
             <Sticker color="#E5F4DF" rotate={-8}>
-              30 days.
+              21 days.
               <br />
               one streak.
             </Sticker>
@@ -47,7 +47,7 @@ export function PrizeSection({ prizeText, prizeTerms }: { prizeText: string; pri
           />
           <ol className="mt-8 grid gap-3 sm:grid-cols-2">
             {[
-              ["01", "Complete the 30-day challenge"],
+              ["01", "Complete the 21-day challenge"],
               ["02", "Stay consistent, every day"],
               ["03", "Climb the leaderboard"],
               ["04", "Win the on-ground final — ₹30,000"],

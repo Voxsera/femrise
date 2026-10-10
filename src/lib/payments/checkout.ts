@@ -45,7 +45,7 @@ export async function startPayment(opts: {
       amount: order.amount,
       currency: order.currency,
       name: "Fem Rise Club",
-      description: opts.type === "restore" ? "Streak Restore" : "30 Day Sports Challenge entry",
+      description: opts.type === "restore" ? "Streak Restore" : "Mid-Winter Arc 21 Day Challenge entry",
       image: `${window.location.origin}/brand/femrise-logo.png`,
       prefill: opts.prefill,
       theme: { color: "#0A0A0A" },

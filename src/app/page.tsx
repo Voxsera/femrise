@@ -27,7 +27,7 @@ export default async function HomePage() {
       {isDemo && <DemoBanner />}
       <Navbar fee={fee} />
       <main>
-        <Hero fee={fee} participantCount={participantCount} avatars={leaderboard} />
+        <Hero fee={fee} startDate={settings.startDate} participantCount={participantCount} avatars={leaderboard} />
         <SportsMarquee />
         <HowItWorks fee={fee} />
         <ChallengeSection duration={settings.durationDays} />

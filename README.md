@@ -1,4 +1,4 @@
-# Fem Rise Club — 30 Day Sports Challenge
+# Fem Rise Club — Mid-Winter Arc · 21 Day FemRise Challenge
 
 Next.js 15 (App Router) · Tailwind CSS · Framer Motion · Supabase · Razorpay
 
@@ -15,7 +15,7 @@ Open http://localhost:3000
 ## Connect the backend (Supabase)
 
 1. Create a project at supabase.com (region: Mumbai).
-2. SQL Editor → paste `supabase/schema.sql` → Run. This creates all tables, security rules (RLS), streak/points logic, storage buckets and the first challenge.
+2. SQL Editor → paste `supabase/schema.sql` → Run. This creates all tables, security rules (RLS), streak/points logic, storage buckets and the first challenge. On a fresh project run only `schema.sql` — the files in `supabase/migrations` are only for databases created before those changes.
 3. Authentication → Providers → Email: turn **Confirm email** off for the smoothest signup → payment flow (or keep it on; the flow handles both).
 4. Copy the URL, anon key and service role key into `.env.local`.
 5. Sign up on the site, then make yourself admin in the SQL editor:
@@ -34,11 +34,12 @@ Open http://localhost:3000
 Google users are asked for username, phone, city and sport on /join before paying.
 If you ran schema.sql before this was added, also run `supabase/migrations/002_google_auth.sql`.
 
-## Connect payments (Razorpay)
+## Payments (GPay / UPI QR)
 
-1. Add the key id, key secret and a webhook secret to `.env.local`.
-2. Razorpay Dashboard → Webhooks → URL `https://<domain>/api/payments/webhook`, events `payment.captured`, `order.paid`, `payment.failed`.
-3. Amounts always come from the challenge settings in the database, never from the browser.
+1. Save the GPay QR image as `public/payments/upi-qr.png`.
+2. Add `NEXT_PUBLIC_UPI_ID` (e.g. `femrise@okaxis`) and `NEXT_PUBLIC_UPI_NAME` to `.env.local` and Vercel.
+3. Participants pay ₹99, then submit the UPI transaction ID (UTR) + screenshot on /join.
+4. Admins open **/admin/payments**, match the UTR with the GPay/bank statement and click Approve — the participant becomes active.
 
 ## What still needs a decision from Fem Rise Club
 

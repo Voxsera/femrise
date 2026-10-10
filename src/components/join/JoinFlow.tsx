@@ -1,21 +1,35 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Camera, Check, Loader2, Lock, Globe } from "lucide-react";
+import { Camera, Check, Clock, Loader2, Lock, Globe } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { inputClass, labelClass } from "@/components/ui/AuthShell";
 import { SPORTS } from "@/lib/defaults";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import { startPayment } from "@/lib/payments/checkout";
 import { GoogleButton } from "./GoogleButton";
+import { UpiPayment } from "./UpiPayment";
 
-type Step = "account" | "profile" | "payment" | "welcome" | "confirm-email";
+type Step = "account" | "profile" | "payment" | "review" | "welcome" | "confirm-email";
 
 const USERNAME_RE = /^[a-z0-9._]{3,24}$/;
 
-export function JoinFlow({ fee, referralCode, supabaseReady }: { fee: number; referralCode: string; supabaseReady: boolean }) {
+export type UpiSettings = { qrFiles: string[]; upiId: string; upiName: string };
+
+export function JoinFlow({
+  fee,
+  referralCode,
+  supabaseReady,
+  challengeId,
+  upi,
+}: {
+  fee: number;
+  referralCode: string;
+  supabaseReady: boolean;
+  challengeId: string;
+  upi: UpiSettings;
+}) {
   const supabase = getSupabaseBrowserClient();
   const [step, setStep] = useState<Step>("account");
   const [busy, setBusy] = useState(false);
@@ -23,6 +37,7 @@ export function JoinFlow({ fee, referralCode, supabaseReady }: { fee: number; re
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [payNotice, setPayNotice] = useState<string | null>(null);
   const [form, setForm] = useState({
     fullName: "",
     username: "",
@@ -41,10 +56,18 @@ export function JoinFlow({ fee, referralCode, supabaseReady }: { fee: number; re
     supabase.auth.getUser().then(async ({ data }) => {
       const user = data.user;
       if (!user) return;
-      const [{ data: profile }, { data: contact }, { data: p }] = await Promise.all([
+      const [{ data: profile }, { data: contact }, { data: p }, { data: lastPay }] = await Promise.all([
         supabase.from("profiles").select("full_name, username, city, primary_sport, privacy, onboarded").eq("id", user.id).maybeSingle(),
         supabase.from("profile_contacts").select("phone").eq("user_id", user.id).maybeSingle(),
         supabase.from("challenge_participants").select("status").eq("user_id", user.id).maybeSingle(),
+        supabase
+          .from("payments")
+          .select("status, failure_reason")
+          .eq("user_id", user.id)
+          .eq("payment_type", "registration")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
       ]);
       setUserId(user.id);
       setForm((f) => ({
@@ -59,7 +82,11 @@ export function JoinFlow({ fee, referralCode, supabaseReady }: { fee: number; re
       }));
       // Google sign-ups land here without challenge details yet.
       if (profile && !profile.onboarded) return setStep("profile");
-      setStep(p && p.status !== "pending_payment" ? "welcome" : "payment");
+      if (p && p.status !== "pending_payment") return setStep("welcome");
+      if (lastPay?.status === "submitted") return setStep("review");
+      if (lastPay?.status === "rejected")
+        setPayNotice(`Your last payment couldn't be verified: ${lastPay.failure_reason ?? "please try again"}. Please pay again or contact us.`);
+      setStep("payment");
     });
   }, [supabase]);
 
@@ -161,18 +188,6 @@ export function JoinFlow({ fee, referralCode, supabaseReady }: { fee: number; re
     setStep("payment");
   }
 
-  async function pay() {
-    setError(null);
-    setBusy(true);
-    const r = await startPayment({
-      type: "registration",
-      referralCode: form.referral || referralCode || undefined,
-      prefill: { name: form.fullName, email: form.email, contact: form.phone },
-    });
-    setBusy(false);
-    if (r.ok) setStep("welcome");
-    else setError(r.error);
-  }
 
   return (
     <div>
@@ -376,20 +391,37 @@ export function JoinFlow({ fee, referralCode, supabaseReady }: { fee: number; re
 
         {step === "payment" && (
           <motion.div key="payment" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <div className="card-pop relative p-6">
-              <span className="tape" />
-              <p className="font-display text-2xl font-bold">Join the challenge</p>
-              <div className="my-6 flex items-end justify-between border-y-2 border-dashed border-ink/30 py-5">
-                <span className="font-bold text-fr-charcoal">Entry fee</span>
-                <span className="h-display text-6xl">₹{fee}</span>
-              </div>
-              <p className="text-[15px] text-fr-charcoal">Complete payment to activate your challenge account.</p>
-            </div>
-            {error && <p className="mt-4 rounded-[10px] border-2 border-fr-red bg-fr-red/10 p-3 text-sm font-medium text-fr-red">{error}</p>}
-            <button onClick={pay} disabled={busy} className="btn-yellow mt-6 w-full py-4 disabled:opacity-60">
-              {busy && <Loader2 className="h-4 w-4 animate-spin" />} Pay ₹{fee} securely
-            </button>
-            <p className="mt-3 text-center text-[13px] text-fr-muted">Your challenge activates only after payment is confirmed.</p>
+            <UpiPayment
+              fee={fee}
+              challengeId={challengeId}
+              referralCode={form.referral || referralCode}
+              qrFiles={upi.qrFiles}
+              upiId={upi.upiId}
+              upiName={upi.upiName}
+              notice={payNotice}
+              onSubmitted={() => {
+                setPayNotice(null);
+                setStep("review");
+              }}
+            />
+          </motion.div>
+        )}
+
+        {step === "review" && (
+          <motion.div key="review" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="card-pop relative bg-fr-softblue p-7 text-center">
+            <span className="tape" />
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-ink bg-white">
+              <Clock className="h-7 w-7" strokeWidth={2.4} />
+            </span>
+            <p className="h-display mt-5 text-4xl">Payment received!</p>
+            <p className="mt-3 text-[15px] text-fr-charcoal">
+              We&apos;re verifying your ₹{fee} payment. This usually takes a few hours. Once it&apos;s confirmed you&apos;re officially in the
+              Mid-Winter Arc — check back on this page anytime.
+            </p>
+            <p className="mt-4 font-hand text-3xl">see you on 1 Nov!</p>
+            <Link href="/" className="btn-outline mt-6">
+              Back to site
+            </Link>
           </motion.div>
         )}
 
@@ -444,10 +476,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function Steps({ step }: { step: Step }) {
-  const idx = step === "account" || step === "profile" || step === "confirm-email" ? 0 : step === "payment" ? 1 : 2;
+  const idx = step === "account" || step === "profile" || step === "confirm-email" ? 0 : step === "payment" || step === "review" ? 1 : 2;
   return (
     <ol className="mb-10 grid grid-cols-3 gap-3">
-      {["Account", "Payment", "Start"].map((s, i) => (
+      {["Sign in", "Payment", "You\u2019re in"].map((s, i) => (
         <li key={s} className="flex items-center gap-2">
           <span
             className={clsx(

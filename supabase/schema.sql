@@ -20,7 +20,8 @@ create type public.participant_status as enum
 create type public.checkin_status as enum ('valid', 'invalid', 'removed');
 create type public.day_result_type as enum ('missed', 'restored');
 create type public.payment_type as enum ('registration', 'restore');
-create type public.payment_status as enum ('created', 'paid', 'failed', 'refunded');
+-- created → (razorpay) paid/failed;  submitted → (UPI, admin checks) paid/rejected
+create type public.payment_status as enum ('created', 'submitted', 'paid', 'failed', 'rejected', 'refunded');
 create type public.refund_status as enum ('none', 'requested', 'processed');
 create type public.follow_status as enum ('pending', 'approved', 'declined');
 create type public.report_status as enum ('open', 'reviewed', 'actioned', 'dismissed');
@@ -56,7 +57,7 @@ create table public.challenges (
   name text not null,
   status public.challenge_status not null default 'draft',
   start_date date,
-  duration_days int not null default 30 check (duration_days between 1 and 365),
+  duration_days int not null default 21 check (duration_days between 1 and 365),
   timezone text not null default 'Asia/Kolkata',
   registration_fee_paise int not null default 9900 check (registration_fee_paise >= 0),
   restore_fee_paise int not null default 5000 check (restore_fee_paise >= 0),
@@ -171,17 +172,23 @@ create table public.payments (
   amount_paise int not null,
   currency text not null default 'INR',
   status public.payment_status not null default 'created',
-  provider text not null default 'razorpay',
+  provider text not null default 'upi', -- 'upi' (GPay QR, verified by an admin) or 'razorpay'
   provider_order_id text unique,
   provider_payment_id text,
   challenge_day int, -- for restores: the day being restored
   failure_reason text,
   refund_status public.refund_status not null default 'none',
   raw_event jsonb,
+  utr text, -- UPI transaction ID the participant typed in
+  proof_path text, -- screenshot in the private payment-proofs bucket
+  reviewed_by uuid references public.profiles (id),
+  reviewed_at timestamptz,
   created_at timestamptz not null default now(),
   paid_at timestamptz
 );
 create index on public.payments (challenge_id, payment_type, status);
+-- The same UPI transaction can't be used twice (rejected ones can be resubmitted).
+create unique index payments_utr_unique on public.payments (upper(utr)) where utr is not null and status <> 'rejected';
 
 create table public.restores (
   id uuid primary key default gen_random_uuid(),
@@ -607,6 +614,80 @@ end;
 $$;
 
 -- =====================================================================
+-- UPI / GPAY QR PAYMENTS — participant submits the transaction ID + screenshot,
+-- an admin checks it against the bank/GPay app and approves or rejects.
+-- =====================================================================
+create or replace function public.submit_upi_payment(
+  p_challenge uuid, p_utr text, p_proof_path text, p_referral_code text default null
+) returns payments language plpgsql security definer set search_path = public as $$
+declare
+  v_uid uuid := auth.uid();
+  v_c challenges%rowtype;
+  v_part challenge_participants%rowtype;
+  v_pay payments%rowtype;
+  v_utr text := upper(regexp_replace(coalesce(p_utr, ''), '\s', '', 'g'));
+begin
+  if v_uid is null then raise exception 'Please sign in first'; end if;
+  if v_utr !~ '^[A-Z0-9]{10,22}$' then raise exception 'Enter the 12-digit UPI transaction ID from your payment app'; end if;
+  if p_proof_path is null or split_part(p_proof_path, '/', 1) <> v_uid::text then
+    raise exception 'Please upload the payment screenshot';
+  end if;
+  select * into v_c from challenges where id = p_challenge;
+  if not found then raise exception 'Challenge not found'; end if;
+
+  v_part := join_challenge(p_challenge, p_referral_code);
+  if v_part.status <> 'pending_payment' then raise exception 'You are already registered'; end if;
+
+  if exists (select 1 from payments where upper(utr) = v_utr and status <> 'rejected' and participant_id <> v_part.id) then
+    raise exception 'This transaction ID has already been used';
+  end if;
+
+  -- One open submission per participant: update it if they resubmit before review.
+  select * into v_pay from payments
+    where participant_id = v_part.id and payment_type = 'registration' and status = 'submitted' for update;
+  if found then
+    update payments set utr = v_utr, proof_path = p_proof_path, created_at = now()
+      where id = v_pay.id returning * into v_pay;
+  else
+    insert into payments (user_id, participant_id, challenge_id, payment_type, amount_paise, status, provider,
+                          provider_order_id, utr, proof_path)
+    values (v_uid, v_part.id, p_challenge, 'registration', v_c.registration_fee_paise, 'submitted', 'upi',
+            'upi_' || gen_random_uuid(), v_utr, p_proof_path)
+    returning * into v_pay;
+  end if;
+
+  perform log_activity(v_part.id, 'payment_submitted', null, jsonb_build_object('utr', v_utr));
+  perform notify_admins('upi_payment', 'New UPI payment to verify', 'UTR ' || v_utr);
+  return v_pay;
+end;
+$$;
+
+create or replace function public.admin_review_upi_payment(p_payment uuid, p_approve boolean, p_note text default null)
+returns void language plpgsql security definer set search_path = public as $$
+declare v_pay payments%rowtype;
+begin
+  if not is_admin() then raise exception 'Admins only'; end if;
+  select * into v_pay from payments where id = p_payment for update;
+  if not found then raise exception 'Payment not found'; end if;
+  if v_pay.status <> 'submitted' then raise exception 'This payment was already reviewed'; end if;
+
+  if p_approve then
+    perform apply_registration_payment(v_pay.provider_order_id, v_pay.utr, null);
+    update payments set reviewed_by = auth.uid(), reviewed_at = now() where id = v_pay.id;
+    perform notify(v_pay.user_id, 'payment_approved', 'Payment confirmed — you are in the challenge!');
+  else
+    update payments set status = 'rejected', failure_reason = coalesce(nullif(trim(p_note), ''), 'Payment could not be verified'),
+      reviewed_by = auth.uid(), reviewed_at = now() where id = v_pay.id;
+    perform notify(v_pay.user_id, 'payment_rejected', 'We could not verify your payment', p_note);
+  end if;
+
+  insert into admin_logs (admin_id, action, affected_user_id, details)
+  values (auth.uid(), case when p_approve then 'approve_payment' else 'reject_payment' end, v_pay.user_id,
+          jsonb_build_object('payment_id', v_pay.id, 'utr', v_pay.utr, 'note', p_note));
+end;
+$$;
+
+-- =====================================================================
 -- DEADLINE PROCESSING — marks missed days and applies Restore / elimination.
 -- Runs from pg_cron (see bottom). Does nothing until the admin sets a deadline.
 -- =====================================================================
@@ -896,6 +977,12 @@ revoke execute on function public.notify_admins(text, text, text) from public, a
 -- =====================================================================
 insert into storage.buckets (id, name, public) values ('snaps', 'snaps', false) on conflict do nothing;
 insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true) on conflict do nothing;
+insert into storage.buckets (id, name, public) values ('payment-proofs', 'payment-proofs', false) on conflict do nothing;
+
+create policy "upload own payment proof" on storage.objects for insert to authenticated
+  with check (bucket_id = 'payment-proofs' and (storage.foldername(name))[1] = auth.uid()::text);
+create policy "view own payment proof" on storage.objects for select to authenticated
+  using (bucket_id = 'payment-proofs' and ((storage.foldername(name))[1] = auth.uid()::text or public.is_admin()));
 
 create policy "upload own snaps" on storage.objects for insert to authenticated
   with check (bucket_id = 'snaps' and (storage.foldername(name))[1] = auth.uid()::text);
@@ -909,11 +996,11 @@ create policy "update own avatar" on storage.objects for update to authenticated
 -- =====================================================================
 -- SEED: the first challenge. Edit everything later from the Admin Dashboard.
 -- =====================================================================
-insert into public.challenges (slug, name, status, duration_days, prize_text, rules)
+insert into public.challenges (slug, name, status, start_date, duration_days, prize_text, rules)
 values (
-  '30-day-sports-challenge', '30 Day Sports Challenge', 'registration_open', 30,
-  'Complete the 30-day challenge, stay consistent and climb the leaderboard. Then step up for the final on-ground round and compete to win ₹30,000 in prize money.',
-  '["Entry fee: ₹99","Challenge duration: 30 days","One daily sports check-in required","Participants must upload a daily snap","Missing a day breaks the streak","Earn additional points through successful referrals","The leaderboard is visible to all participants","The challenge ends with a final on-ground round","The winner of the on-ground round wins ₹30,000 prize money","Choose a Public or Private profile","Private profiles still appear on the leaderboard","Private snaps are only visible to approved followers","Uploaded content must follow community guidelines"]'::jsonb
+  '30-day-sports-challenge', 'Mid-Winter Arc — 21 Day FemRise Challenge', 'registration_open', '2026-11-01', 21,
+  'Complete the 21-day challenge, stay consistent and climb the leaderboard. Then step up for the final on-ground round and compete to win ₹30,000 in prize money.',
+  '["Entry fee: ₹99","Challenge duration: 21 days (1–21 November)","One daily sports check-in required","Participants must upload a daily snap","Missing a day breaks the streak","Earn additional points through successful referrals","The leaderboard is visible to all participants","The challenge ends with a final on-ground round","The winner of the on-ground round wins ₹30,000 prize money","Choose a Public or Private profile","Private profiles still appear on the leaderboard","Private snaps are only visible to approved followers","Uploaded content must follow community guidelines"]'::jsonb
 ) on conflict (slug) do nothing;
 
 -- =====================================================================

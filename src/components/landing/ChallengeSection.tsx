@@ -7,7 +7,7 @@ import { Arrow, Circled, Blob } from "@/components/doodle/Doodles";
 import type { DayState } from "@/lib/types";
 
 // Example journey: 12 days done, today is Day 13.
-const example: DayState[] = Array.from({ length: 30 }, (_, i) => (i < 12 ? "completed" : i === 12 ? "current" : "future"));
+const example: DayState[] = Array.from({ length: 21 }, (_, i) => (i < 12 ? "completed" : i === 12 ? "current" : "future"));
 
 export function ChallengeSection({ duration }: { duration: number }) {
   return (

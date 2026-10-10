@@ -9,6 +9,8 @@ export const env = {
   razorpayKeyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "",
   razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET ?? "",
   razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET ?? "",
+  upiId: process.env.NEXT_PUBLIC_UPI_ID ?? "",
+  upiName: process.env.NEXT_PUBLIC_UPI_NAME ?? "Fem Rise Club",
   challengeSlug: process.env.NEXT_PUBLIC_CHALLENGE_SLUG ?? "30-day-sports-challenge",
 };
 

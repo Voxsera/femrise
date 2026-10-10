@@ -18,7 +18,7 @@ export function Footer({ fee, cta = true }: { fee?: number; cta?: boolean }) {
           <Reveal className="container-x relative">
             <span className="eyebrow !bg-none bg-white">Ready to start your streak?</span>
             <h2 className="h-display mx-auto mt-6 max-w-4xl text-5xl sm:text-7xl lg:text-8xl">
-              30 days. One streak.
+              21 days. One streak.
               <br />
               <span className="font-hand font-normal">Win ₹30,000 prize money!</span>
             </h2>
@@ -34,7 +34,7 @@ export function Footer({ fee, cta = true }: { fee?: number; cta?: boolean }) {
         <div className="container-x grid gap-10 pb-28 pt-14 sm:pb-12 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div>
             <Logo size={84} />
-            <p className="mt-4 max-w-[240px] text-[15px] text-fr-charcoal">A community for women who play. 30 Day Sports Challenge.</p>
+            <p className="mt-4 max-w-[240px] text-[15px] text-fr-charcoal">A community for women who play. Mid-Winter Arc — 21 Day Challenge.</p>
           </div>
           <FooterCol title="Challenge" links={[["/#how-it-works", "How it works"], ["/#prize", "Prize"], ["/#rules", "Rules"], ["/#prize-terms", "Prize terms"]]} />
           <FooterCol title="Community" links={[["/leaderboard", "Leaderboard"], ["/#community", "Participants"], ["/#referrals", "Referrals"]]} />

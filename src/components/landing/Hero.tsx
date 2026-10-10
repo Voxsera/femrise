@@ -18,18 +18,31 @@ function findHeroPhoto() {
   return null;
 }
 
+/** "Mid-Winter Arc · Starts 1 Nov · 22 days to go" until the start date, then "Live now". */
+function seasonBadge(startDate: string | null) {
+  if (!startDate) return "Mid-Winter Arc";
+  const start = new Date(`${startDate}T00:00:00+05:30`);
+  const label = start.toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
+  const days = Math.ceil((start.getTime() - Date.now()) / 86_400_000);
+  if (days <= 0) return "Mid-Winter Arc · Live now";
+  return `Mid-Winter Arc · Starts ${label} · ${days} day${days === 1 ? "" : "s"} to go`;
+}
+
 export function Hero({
   fee,
+  startDate,
   participantCount,
   avatars,
 }: {
   fee: number;
+  startDate: string | null;
   participantCount: number;
   avatars: LeaderboardRow[];
 }) {
   const photo = findHeroPhoto();
+  const badge = seasonBadge(startDate);
   const perks = [
-    { Icon: CalendarCheck, label: "30 days", sub: "Any sport counts", tint: "#DCE8FF", color: "#1748E8" },
+    { Icon: CalendarCheck, label: "21 days", sub: "1–21 Nov · any sport", tint: "#DCE8FF", color: "#1748E8" },
     { Icon: Camera, label: "Daily check-in", sub: "One snap a day", tint: "#E5F4DF", color: "#62B946" },
     { Icon: Trophy, label: "Final round", sub: "On-ground · ₹30K", tint: "#FFF6D8", color: "#F4A623" },
   ];
@@ -38,10 +51,10 @@ export function Hero({
     <section className="relative overflow-hidden pb-16 pt-28 lg:pb-24 lg:pt-36">
       <div className="container-x grid items-center gap-10 lg:grid-cols-[1.05fr_1fr]">
         <div className="relative z-10">
-          <HeroCopy />
+          <HeroCopy badge={badge} />
 
           <p className="mt-6 max-w-md text-[17px] leading-relaxed text-fr-charcoal">
-            Show up for yourself for 30 days. <b>Play your sport</b>, post your <b>daily check-in</b>, climb the
+            Show up for yourself for 21 days. <b>Play your sport</b>, post your <b>daily check-in</b>, climb the
             leaderboard and make it to the <b>final on-ground round</b>.
           </p>
 

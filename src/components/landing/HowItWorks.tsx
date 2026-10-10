@@ -8,7 +8,7 @@ import { Arrow } from "@/components/doodle/Doodles";
 export function HowItWorks({ fee }: { fee: number }) {
   const steps = [
     { n: "01", t: "Join", d: `Create your Femrise! account and pay ₹${fee}.`, Icon: UserPlus, bg: "#FBBE18", rot: -2 },
-    { n: "02", t: "Play", d: "Play a sport every day for 30 days.", Icon: Flame, bg: "#DCE8FF", rot: 1.5 },
+    { n: "02", t: "Play", d: "Play a sport every day for 21 days.", Icon: Flame, bg: "#DCE8FF", rot: 1.5 },
     { n: "03", t: "Check in", d: "Upload your daily snap showing your participation.", Icon: Camera, bg: "#E5F4DF", rot: -1 },
     { n: "04", t: "Stay consistent", d: "Don't miss a day. Every check-in keeps your streak alive.", Icon: ShieldCheck, bg: "#FFF6D8", rot: 2 },
     { n: "05", t: "Climb", d: "Earn points, invite friends and climb the leaderboard.", Icon: TrendingUp, bg: "#FBBE18", rot: -1.5 },

@@ -13,7 +13,7 @@ export function LeaderboardPreview({ rows }: { rows: LeaderboardRow[] }) {
       <div className="container-x">
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <SectionHead eyebrow="Live leaderboard" title="The streak board" />
-          <p className="max-w-xs font-hand text-3xl leading-tight lg:text-right">30 days. One challenge. Keep showing up.</p>
+          <p className="max-w-xs font-hand text-3xl leading-tight lg:text-right">21 days. One challenge. Keep showing up.</p>
         </div>
 
         <div className="card-pop mt-12 overflow-hidden bg-white">

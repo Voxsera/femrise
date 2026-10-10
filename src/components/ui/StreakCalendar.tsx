@@ -14,7 +14,7 @@ const stateStyles: Record<DayState, string> = {
 
 const mark: Partial<Record<DayState, string>> = { completed: "✓", missed: "✕", restored: "↺", current: "●" };
 
-/** 30-day streak grid: green done · yellow today · red missed · blue restored · white upcoming. */
+/** 21-day streak grid: green done · yellow today · red missed · blue restored · white upcoming. */
 export function StreakCalendar({ days, compact = false, className }: { days: DayState[]; compact?: boolean; className?: string }) {
   return (
     <motion.ol
@@ -23,7 +23,7 @@ export function StreakCalendar({ days, compact = false, className }: { days: Day
       whileInView="show"
       viewport={{ once: true }}
       variants={{ hidden: {}, show: { transition: { staggerChildren: 0.02 } } }}
-      aria-label="30 day streak calendar"
+      aria-label="21 day streak calendar"
     >
       {days.map((state, i) => (
         <motion.li
