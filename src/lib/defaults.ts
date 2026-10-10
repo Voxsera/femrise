@@ -7,7 +7,7 @@ import type { ChallengeSettings } from "./types";
  */
 export const DEFAULT_SETTINGS: ChallengeSettings = {
   id: "demo",
-  slug: "30-day-sports-challenge",
+  slug: "21-day-sports-challenge",
   name: "Mid-Winter Arc — 21 Day FemRise Challenge",
   status: "registration_open",
   startDate: "2026-11-01",

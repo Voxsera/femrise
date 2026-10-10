@@ -11,7 +11,7 @@ export const env = {
   razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET ?? "",
   upiId: process.env.NEXT_PUBLIC_UPI_ID ?? "",
   upiName: process.env.NEXT_PUBLIC_UPI_NAME ?? "Fem Rise Club",
-  challengeSlug: process.env.NEXT_PUBLIC_CHALLENGE_SLUG ?? "30-day-sports-challenge",
+  challengeSlug: process.env.NEXT_PUBLIC_CHALLENGE_SLUG ?? "21-day-sports-challenge",
 };
 
 export const isSupabaseConfigured = Boolean(env.supabaseUrl && env.supabaseAnonKey);

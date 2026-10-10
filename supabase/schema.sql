@@ -998,7 +998,7 @@ create policy "update own avatar" on storage.objects for update to authenticated
 -- =====================================================================
 insert into public.challenges (slug, name, status, start_date, duration_days, prize_text, rules)
 values (
-  '30-day-sports-challenge', 'Mid-Winter Arc — 21 Day FemRise Challenge', 'registration_open', '2026-11-01', 21,
+  '21-day-sports-challenge', 'Mid-Winter Arc — 21 Day FemRise Challenge', 'registration_open', '2026-11-01', 21,
   'Complete the 21-day challenge, stay consistent and climb the leaderboard. Then step up for the final on-ground round and compete to win ₹30,000 in prize money.',
   '["Entry fee: ₹99","Challenge duration: 21 days (1–21 November)","One daily sports check-in required","Participants must upload a daily snap","Missing a day breaks the streak","Earn additional points through successful referrals","The leaderboard is visible to all participants","The challenge ends with a final on-ground round","The winner of the on-ground round wins ₹30,000 prize money","Choose a Public or Private profile","Private profiles still appear on the leaderboard","Private snaps are only visible to approved followers","Uploaded content must follow community guidelines"]'::jsonb
 ) on conflict (slug) do nothing;

@@ -68,6 +68,8 @@ export function UpiPayment({
     e.preventDefault();
     setError(null);
     if (!supabase) return setError("Registration isn't connected yet. Add your Supabase keys (see README).");
+    if (challengeId === "demo")
+      return setError("The challenge isn't set up in the database yet (no row in the challenges table). Run supabase/repair_seed.sql in Supabase.");
     const clean = utr.replace(/\s/g, "");
     if (!/^[A-Za-z0-9]{10,22}$/.test(clean)) return setError("Enter the 12-digit UPI transaction ID shown in your payment app.");
     if (!proof) return setError("Please upload the payment screenshot.");
