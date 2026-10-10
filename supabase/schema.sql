@@ -59,8 +59,8 @@ create table public.challenges (
   start_date date,
   duration_days int not null default 21 check (duration_days between 1 and 365),
   timezone text not null default 'Asia/Kolkata',
-  registration_fee_paise int not null default 9900 check (registration_fee_paise >= 0),
-  restore_fee_paise int not null default 5000 check (restore_fee_paise >= 0),
+  registration_fee int not null default 99 check (registration_fee >= 0), -- in rupees
+  restore_fee int not null default 50 check (restore_fee >= 0), -- in rupees
   daily_checkin_points int not null default 10,
   referral_points int not null default 10,
   bonus_rules jsonb not null default '{}'::jsonb, -- future bonus point rules
@@ -169,7 +169,7 @@ create table public.payments (
   participant_id uuid not null references public.challenge_participants (id) on delete cascade,
   challenge_id uuid not null references public.challenges (id) on delete cascade,
   payment_type public.payment_type not null,
-  amount_paise int not null,
+  amount int not null, -- in rupees
   currency text not null default 'INR',
   status public.payment_status not null default 'created',
   provider text not null default 'upi', -- 'upi' (GPay QR, verified by an admin) or 'razorpay'
@@ -554,7 +554,7 @@ begin
   update payments set status = 'paid', provider_payment_id = p_payment_id, paid_at = now(), raw_event = p_raw where id = v_pay.id;
   update challenge_participants set status = 'active', activated_at = now()
     where id = v_pay.participant_id and status = 'pending_payment';
-  perform log_activity(v_pay.participant_id, 'paid', null, jsonb_build_object('amount_paise', v_pay.amount_paise));
+  perform log_activity(v_pay.participant_id, 'paid', null, jsonb_build_object('amount', v_pay.amount));
 
   -- Referral points only after successful payment.
   select * into v_ref from referrals where referred_participant_id = v_pay.participant_id for update;
@@ -596,7 +596,7 @@ begin
   update challenge_participants set status = 'active', restore_used = true,
     restore_used_on_day = pending_restore_day, pending_restore_day = null
     where id = v_p.id;
-  perform log_activity(v_p.id, 'restore_purchased', v_p.pending_restore_day, jsonb_build_object('amount_paise', v_pay.amount_paise));
+  perform log_activity(v_p.id, 'restore_purchased', v_p.pending_restore_day, jsonb_build_object('amount', v_pay.amount));
   perform recompute_participant(v_p.id);
   perform notify(v_p.user_id, 'restore', 'Restore activated. Your challenge continues.');
 end;
@@ -649,9 +649,9 @@ begin
     update payments set utr = v_utr, proof_path = p_proof_path, created_at = now()
       where id = v_pay.id returning * into v_pay;
   else
-    insert into payments (user_id, participant_id, challenge_id, payment_type, amount_paise, status, provider,
+    insert into payments (user_id, participant_id, challenge_id, payment_type, amount, status, provider,
                           provider_order_id, utr, proof_path)
-    values (v_uid, v_part.id, p_challenge, 'registration', v_c.registration_fee_paise, 'submitted', 'upi',
+    values (v_uid, v_part.id, p_challenge, 'registration', v_c.registration_fee, 'submitted', 'upi',
             'upi_' || gen_random_uuid(), v_utr, p_proof_path)
     returning * into v_pay;
   end if;

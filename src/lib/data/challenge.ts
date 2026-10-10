@@ -13,8 +13,8 @@ type ChallengeRow = {
   start_date: string | null;
   duration_days: number;
   timezone: string;
-  registration_fee_paise: number;
-  restore_fee_paise: number;
+  registration_fee: number; // rupees
+  restore_fee: number; // rupees
   daily_checkin_points: number;
   referral_points: number;
   checkin_deadline: string | null;
@@ -34,8 +34,8 @@ function mapChallenge(row: ChallengeRow): ChallengeSettings {
     startDate: row.start_date,
     durationDays: row.duration_days,
     timezone: row.timezone,
-    registrationFee: Math.round(row.registration_fee_paise / 100),
-    restoreFee: Math.round(row.restore_fee_paise / 100),
+    registrationFee: row.registration_fee,
+    restoreFee: row.restore_fee,
     dailyCheckinPoints: row.daily_checkin_points,
     referralPoints: row.referral_points,
     checkinDeadline: row.checkin_deadline ? row.checkin_deadline.slice(0, 5) : null,

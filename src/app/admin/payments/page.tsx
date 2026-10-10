@@ -20,7 +20,7 @@ type PaymentRow = {
   id: string;
   user_id: string;
   status: string;
-  amount_paise: number;
+  amount: number; // rupees
   utr: string | null;
   proof_path: string | null;
   failure_reason: string | null;
@@ -48,7 +48,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
   const [{ data: rows }, { count: pendingCount }] = await Promise.all([
     supabase
       .from("payments")
-      .select("id, user_id, status, amount_paise, utr, proof_path, failure_reason, created_at, reviewed_at, profiles!payments_user_id_fkey(username, full_name, city)")
+      .select("id, user_id, status, amount, utr, proof_path, failure_reason, created_at, reviewed_at, profiles!payments_user_id_fkey(username, full_name, city)")
       .eq("provider", "upi")
       .eq("status", tab)
       .order("created_at", { ascending: tab === "submitted" })
@@ -123,7 +123,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
                     </div>
                     <div>
                       <dt className="text-[12px] font-bold uppercase tracking-[0.12em] text-fr-muted">Amount</dt>
-                      <dd className="font-bold">₹{p.amount_paise / 100}</dd>
+                      <dd className="font-bold">₹{p.amount}</dd>
                     </div>
                     <div>
                       <dt className="text-[12px] font-bold uppercase tracking-[0.12em] text-fr-muted">Submitted</dt>

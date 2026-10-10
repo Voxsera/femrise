@@ -58,9 +58,9 @@ export async function POST(req: Request) {
     }
   }
 
-  const amount = type === "registration" ? challenge.registration_fee_paise : challenge.restore_fee_paise;
+  const amount = type === "registration" ? challenge.registration_fee : challenge.restore_fee // rupees;
 
-  const order = await createOrder(amount, `${type}-${participant.id}`, {
+  const order = await createOrder(amount * 100, `${type}-${participant.id}`, {
     participant_id: participant.id,
     payment_type: type,
   });
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
     participant_id: participant.id,
     challenge_id: challenge.id,
     payment_type: type,
-    amount_paise: amount,
+    amount,
     provider_order_id: order.id,
     challenge_day: type === "restore" ? participant.pending_restore_day : null,
   });
